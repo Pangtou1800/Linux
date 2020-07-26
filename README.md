@@ -133,7 +133,9 @@
     3) Linux的创始人是林纳斯（Linus Torvalds）
 
     4) Linux的吉祥物是企鹅Tux
+
     
+
     5) Linux主要的发行版本
         ※Linux内核添加应用软件后构成一个发行版本
 
@@ -351,10 +353,14 @@
 
     ·/sbin(/usr/sbin, /usr/local/sbin)
         s就是super的意思，这里存放着系统管理员使用的系统管理程序
+
     
+
     ·/home[重点]
         存放普通用户的主目录，在Linux中每个用户都有一个自己的目录，一般该目录是以用户的账号命名的
+
     
+
     ·/root[重点]
         该目录为系统管理员，也称作超级权限者的用户主目录
 
@@ -370,7 +376,9 @@
 
     ·/usr[重点]
         这是一个非常重要的目录，用户的很多应用程序和文件都放在这个目录下，类似于Windows下面的Program Files目录
+
     
+
     ·/boot[重点]
         存放的是启动Linux时使用的一些核心文件，包括一些连接文件以及镜像文件
 
@@ -709,7 +717,9 @@
 ### 9.1 指定运行级别
 
     基本介绍：
+
     
+
         0：关机
         1：单用户（找回丢失密码）
         2：多用户无网络服务
@@ -1015,7 +1025,9 @@
         功能1：
             显示当前日期
         
+
         语法：
+
             date
             date "+%Y%m%d"
             date "+%Y-%m-%d %H:%M:%S"
@@ -1024,6 +1036,7 @@
             设置日期
 
         语法：
+
             date -s 字符串时间
 
             ex. date -s "2020-7-24 20:10:20"
@@ -1033,7 +1046,9 @@
         功能：
             以日历的方式显示时间
         
+
         语法：
+
             cal [选项]
 
             ※没有选项时显示本月日历
@@ -1050,6 +1065,7 @@
             从指定目录向下递归地遍历其各个子目录，将满足条件的文件或者目录显示在终端。
 
         语法：
+
             find 搜索范围 [选项]
 
         选项：
@@ -1066,6 +1082,7 @@
             但是问了保证查询的准确度，管理员必须定时更新Locate时刻。
 
         语法：
+
             lcoate 搜索文件
 
         特别说明：
@@ -1079,10 +1096,12 @@
             grep过滤查找，管道符，“|”，表示将前一个指令的处理输出结果传递给后面的命令处理。
 
         语法：
+
             grep [选项] 查找内容 源文件
 
         常用选项：
             -n 显示行号
+
             -i 忽略字母大小写
 
 ### 9.6 压缩和解压缩类
@@ -1094,6 +1113,7 @@
             gunzip解压.gz文件
 
         语法：
+
             gzip 文件名
             gunzip .gz文件
 
@@ -1106,6 +1126,7 @@
             zip用于压缩文件，unzip用于解压缩，在项目打包发布中很有用。
 
         语法：
+
             zip [选项] xxx.zip 要压缩的目录或文件
             unzip [选项] xxx.zip
         
@@ -1119,6 +1140,7 @@
             tar是打包指令，最后打包好的是.tar.gz文件
 
         语法：
+
             tar [选项] xxx.tar.gz 打包的内容
 
         常用选项：
@@ -1130,18 +1152,447 @@
             -C 指定为目录模式
 
         案例：
+
             1. 压缩多个文件，将/home/a1.txt和/home/a2.txt
+
                 tar -zcvf a.tar.gz /home/a1.txt /home/a2.txt
             
+
             2. 压缩home下的aaa文件夹
+
                 tar -zcvf aaa.tar.gz /home/aaa
 
             3. 解压a.tar.gz到当前目录
+
                 tar -zxcf a.tar.gz
 
             4. 解压a.tar.gz到/home/a
+
                 tar -zxcf a.tar.gz -C /home/a
 
         前提：
             指定解压到的目录必须事先存在
+
+## 第10章 Linux实操篇 组管理和权限管理 ☆
+
+### 10.1 Linux组的基本介绍
+
+    在Linux中的每个用户必须属于一个组，不能独立于组外。
+    在Linux中每个文件都有所有者、所在组、其他组的概念。
+
+    1.所有者
+    2.所在组
+    3.其他组
+    4.改变用户所在的组
+
+### 10.2 文件/目录的所有者
+
+    一般为文件的创建者。谁创建了该文件，就自然成为该文件的所有者。
+
+    ·查看文件的所有者
+
+        语法：
+
+            ls -ahl
+
+        实例：
+            创建一个组Polic，再创建一个用户Tom，将Tom归入Polic组
+            然后使用Tom来创建一个文件OK.txt
+
+    ·修改文件的所有者
+
+        语法：
+
+            chown 用户名 文件名
+
+        实例：
+            使用root创建一个文件Apple.txt，修正其所有者为Tome
+
+        注意：
+            修改用户之后文件所在组并不会发生变化
+
+    
+
+    ·修改文件所在的组
+
+        语法：
+
+            chgrp 组名 文件名
+
+        实例：
+            使用root创建一个文件Orange.txt，修正其所在组为Police
+
+### 10.3 其他组
+
+    除文件的所有者和所在组的用户外，系统的其他用户都是文件的其他组。
+
+### 10.4 权限的基本介绍
+
+    ls -lh 中显示的内容如下：
+
+        -rw-r--r--. 1 Tome    root         14 7月  25 20:10 Apple.txt
+
+        - 文件的类型：
+            - 普通文件  d 目录  l 连接文件  c 字符设备【键盘，鼠标】  b 块文件【硬盘】
+
+         rw- 文件所有者拥有的权限
+            r-- 文件所在组的用户拥有的权限
+               r-- 文件的其他组的用户的权限
+                        r 读权限  w 写权限  x 可执行  - 没有权限
+                    1 如果是文件，表示硬链接的数量；如果是目录，则表示子目录的个数
+                      Tome 文件所有者
+                              root 文件所在组
+                                           14 文件大小（目录统一是4096）
+                                              7月  25 20:10 文件最后的修改时间
+                                                            Apple.txt 文件名
+
+    1.第0位确定文件类型
+    2.第1-3位表示所有者权限
+    3.第4-6位表示所在组的用户的权限
+    4.第7-9位表示其他组的用户的权限
+
+### 10.5 rwx权限详解
+
+    ·rwx作用到文件
+
+        [r]代表可读
+        [w]代表可写，可以修改，但不代表可以删除该文件。
+            删除一个文件的前提条件是对该文件所在的目录有写权限。
+        [x]代表可执行
+
+    ·rwx租用到目录
+
+        [r]代表可读，ls查看目录内容
+        [w]代表可写，可以修改，目录内创建+删除+重命名
+        [x]代表可以进入该目录
+
+    ※rwx可以用数字来表示r: 4 w:2 x:1, 故rwx:7
+
+### 10.6 修改权限
+
+    基本说明：
+        通过chmod指令，可以修改文件或者目录的权限
+
+    语法1：
+
+        + - =变更权限
+
+        u:所有者  g:所在组  o:其他人  a:所有人（u,g,o的总和）
+        chmod u=rwx,g=rx,o=x 文件目录名  为各目标指定权限
+        chmod o+w 文件目录名 为各目标增加权限
+        chmod a-x 文件目录名 为各目标减少权限
+
+    案例1：
+        给abc这个文件 所有者读写执行权限，组读和执行权限，其他人读写权限
+            chmod u=rwx,g=rx,o=rw abc
+        给abc这个文件 所有者减少执行权限，组增加写权限
+            chmod u-x,g+w abc
+
+    语法2：
+        r=4, w=2, x=1
+        通过数字变更权限
+        chmod 751  =>  chmod u=wrx,g=rx,o=x
+
+    案例2：
+        将abc的权限修改为rwxr-x--x
+            chomd 751 abc
+
+### 10.7 修改文件所有者（增强）
+
+    语法：
+        chown newowner file 改变文件的所有者
+        chown newowner:newgroup file 改变文件的所有者和所在组
+
+    常用选项：
+        -R 如果是目录，递归修改目录下所有子目录和文件的所有者
+
+### 10.8 实践：警察和土匪
+
+    组：police, bandit
+    警察：jack, jerry
+    土匪: xh, xq
+
+    1.创建组
+        groupadd police
+        groupadd bandit
+    2.创建用户
+        useradd -g police jack
+        useradd -g police jerry
+        useradd -g bandit xh
+        useradd -g bandit xq
+        ※为所有用户指定密码，用于登录
+            passwd jack
+            ...
+    3.jack创建一个文件，自己可以读写，本组人可以读，其他组人没有任何权限
+        chmod 640 jack01.txt
+    4.jack修改该文件，让其他组人可以读，本组人可以读写
+        chomd g=rw,o=r jack01.txt
+    5.xh投靠警察，看看是否可以读写
+        jack: chmod 750 /home/jack 把自己的家文件开放本组的访问权限（x需要开放）
+        root: usermod -g police xh
+        xh：需要重新登入，组权限才会生效
+
+## 第11章 Linux实操篇 定时任务调度
+
+### 11.1 crond任务调度
+
+    contab进行任务调度
+
+    ·如果只是简单的任务，可以不用写脚本，直接在crontab中加入任务即可
+    ·如果任务比较复杂，主要编写脚本（Shell）
+
+### 11.2 概述
+
+    任务调度：
+        指系统在某个特定的时间执行的特定的命令或程序
+    任务调度分类：
+        1.系统工作
+            有些重要的工作必须周而复始地执行，比如病毒扫描
+        2.个别用户工作
+            个别用户可能希望执行某些工作，比如数据库备份
+
+### 11.3 基本语法
+
+    语法
+        crontab [选项]
+
+    常用选项
+        -e 编辑crontab定时任务
+        -l 查询crontab任务
+        -r 删除当前用户所有的crontab任务
+
+    保存退出后调度任务就会生效    
+
+    service crond restart 重启任务调度进程
+
+### 11.4 快速入门案例
+
+    任务要求：
+        设置个人任务调度 crontab -e
+        接着输入任务调度到文件
+            如：*/1 * * * * ls -l /etc/ > /tmp/to.txt
+            意思：每小时每分钟执行 ls -l /etc/ > /tmp/to.txt 命令
+
+### 11.5 参数细节说明
+
+    ·5个占位符的说明：
+
+        * 一个小时中的第几分钟 0-59
+          * 一天中的第几个小时 0-23
+            * 一个月中的第几天 1-31
+              * 一年当中的第几个月 1-12
+                * 一周当中的星期几 0-7（0和7都代表星期日）
+
+    
+
+    ·特殊符号的说明：
+
+        * 任何时间。
+
+            比如第一个*就代表一小时中每分钟都执行一次。
+        , 代表不连续的时间。
+            比如“0 8, 12, 16 * * *”命令，代表每天的8时0分，12时0分，16时0分执行一次。
+
+        - 代表连续的范围
+
+            比如“0 5 * * 1-6”命令，代表在周一到周六的凌晨5时0分执行命令。
+        */n 代表每隔多久执行一次。
+            比如“*/10 * * * *”命令，代表每隔10分钟执行一次命令。
+
+        ※几号和星期几最好不要同时出现，容易引起混乱
+
+### 11.6 几个应用实例
+
+    1. 每隔1分钟，就将当前的日期信息，追加到/tmp/mydate文件中
+
+        1) 先编写一个Shell文件 myTask1.sh
+            date >> /tmp/mydate
+        2) 给myTask1.sh一个可执行权限
+        3) crontab -e
+        4) */1 * * * * /home/myTask1.sh
+        5) 保存退出
+
+    
+
+    2. 每隔1分钟，把当前日期和日历都写到/tmp/mydate文件中
+
+    3.每天凌晨2:00将MySQL数据库备份到MySQL.db.bak文件中
+        1) 先编写一个Shell文件 myTask3.sh
+            /usr/local/mysql/bin/mysqldump -u root -p root testdb > /tmp/MySQL.db.bak
+        2) 给myTask3.sh一个可执行权限
+        3) crontab -e
+        4) 0 2 * * * /home/myTask3.sh
+        5) 保存退出
+
+## 第12章 Linux实操篇 Linux磁盘分区、挂载
+
+### 12.1 分区基础知识
+
+    分区的两种模式：
+
+        ·mbr分区
+            1.最多支持四个主分区
+            2.系统只能安装在主分区
+            3.扩展分区要占一个主分区
+            4.MBR最大支持2TB，但拥有最好的兼容性
+
+        ·gtp分区
+            1.支持无限多个主分区（但操作系统可能有限制，比如Windows下最多128个分区）
+            2.最大支持18EB的容量（E>P>T>G）
+            3.Windows7 64位之后都支持gtp分区模式
+
+    Windows下的磁盘分区：
+
+        |Disk                                                |
+        |主分区 Primary Partition|扩展分区 Extended Partition |
+                                 |逻辑分区1|逻辑分区2|...     |
+
+### 12.2 Linux分区
+
+    原理介绍：
+
+        1.对Linux来说无论有几个分区，分给哪一个目录使用，它归根结底就只有一个根目录，
+            一个独立且唯一的文件结构，Linux中每个分区都是用来组成整个文件系统的一部分。
+
+        2.Linux采用了一种叫“载入”的处理方法。
+            它的整个文件系统中包含了一整套的文件和目录，且将一个分区和一个目录联系起来。
+            这使要载入的一个分区将使它的存储空间在一个目录下获得。
+
+            mount 挂载
+            umount 卸载
+
+            磁盘            Linux
+                            /
+                            |-----------   ...
+            分区1 ------->  boot/       |
+                                        |
+            分区2 ----------------->  mnt/
+
+### 12.3 硬盘说明
+
+    1.Linux硬盘分IDE硬盘和SCSI硬盘，目前基本上是SCSI硬盘
+
+    2.对于IDE硬盘，驱动器标识符号为“hdx~”，其中“hd”表名分区所在的设备类型，这里指IDE硬盘。
+        “x”为盘号（a为基本盘，b为基本从属盘，c为辅助主盘，d为辅助从属盘。
+        “~"代表分区，前四个分区用数字1~4表示，它们是主分区或扩展分区，从5开始是逻辑分区。
+        例：hda3表示为第一个IDE硬盘上的第三个主分区或扩展分区
+            hdb2就表示第二个IDE硬盘上的第二个主分区或扩展分区
+
+    3.对于SCSI硬盘则标识为“sdx~”，SCSI硬盘用“sd”来表示区分所在设备类型，其余和IDE相同。
+
+### 12.3 查看当前系统的分区情况
+
+    语法
+        lsblk -f
+
+        NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
+        情况   类型          唯一标识分区，格式化后生成             挂载点
+        sda                                                      
+        ├─sda1 ext4         978f776c-462d-4ce6-ae7f-13b39abec695 /boot
+        ├─sda2 swap         a70fff76-c0b8-4163-b406-ffc055946c01 [SWAP]
+        └─sda3 ext4         99e3f6df-65f7-444d-ae4e-16c66e33fd86 /
+
+    
+
+    语法
+        lsblk
+
+        NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+        sda      8:0    0   20G  0 disk 
+        ├─sda1   8:1    0  200M  0 part /boot
+        ├─sda2   8:2    0    2G  0 part [SWAP]
+        └─sda3   8:3    0 17.8G  0 part /
+        sr0     11:0    1 1024M  0 rom                  ←光驱
+
+### 12.4 挂载的经典案例
+
+    案例：
+        为系统增加一块硬盘（2G sdb1到 /home/newdisk）
+    
+    准备工作：
+        为虚拟机增加一块硬盘
+
+        NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+        sr0     11:0    1 1024M  0 rom  
+        sda      8:0    0   20G  0 disk 
+        ├─sda1   8:1    0  200M  0 part /boot
+        ├─sda2   8:2    0    2G  0 part [SWAP]
+        └─sda3   8:3    0 17.8G  0 part /
+        sdb      8:16   0    2G  0 disk 　　　　　　　　　←尚未分区
+
+    步骤：
+        1.分区
+            fdisk [选项] device  - Partition table manipulator for Linux
+              fdisk /dev/sdb
+                m  print help menu
+                n  add a new partition
+                    p  primary partition  
+                    1  prtition number
+                    Enter  first cylinder(default)
+                    Enter  last cylinder(default)
+                w  write table to disk and exit
+
+                d  删除分区
+                p  显示磁盘分区
+
+        NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+        sr0     11:0    1 1024M  0 rom  
+        sda      8:0    0   20G  0 disk 
+        ├─sda1   8:1    0  200M  0 part /boot
+        ├─sda2   8:2    0    2G  0 part [SWAP]
+        └─sda3   8:3    0 17.8G  0 part /
+        sdb      8:16   0    2G  0 disk 
+        └─sdb1   8:17   0    2G  0 part 　　　　　　　　　←分区完成
+
+        NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
+        sr0                                                      
+        sda                                                      
+        ├─sda1 ext4         978f776c-462d-4ce6-ae7f-13b39abec695 /boot
+        ├─sda2 swap         a70fff76-c0b8-4163-b406-ffc055946c01 [SWAP]
+        └─sda3 ext4         99e3f6df-65f7-444d-ae4e-16c66e33fd86 /
+        sdb                                                      
+        └─sdb1  　　　　　                        　　　　←但是没有格式化
+
+        2.格式化
+            mkfs [-t fstype] filesys  - build a Linux file system
+              mkfs -t ext2 /dev/sdb1
+        
+        NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
+        sr0                                                      
+        sda                                                      
+        ├─sda1 ext4         978f776c-462d-4ce6-ae7f-13b39abec695 /boot
+        ├─sda2 swap         a70fff76-c0b8-4163-b406-ffc055946c01 [SWAP]
+        └─sda3 ext4         99e3f6df-65f7-444d-ae4e-16c66e33fd86 /
+        sdb                                                      
+        └─sdb1 ext2         4797ae2c-95a0-4214-aa3a-0d65ce110ccb 
+                                                        ↑格式化完成，没有挂载
+
+        3.挂载
+            a. 创建目录/home/newdisk
+            b. 挂载sdb1到/home/newdisk
+                mount [选项] device dir
+                  mount /dev/sdb1 /home/newdisk
+
+        NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
+        sr0                                                      
+        sda                                                      
+        ├─sda1 ext4         978f776c-462d-4ce6-ae7f-13b39abec695 /boot
+        ├─sda2 swap         a70fff76-c0b8-4163-b406-ffc055946c01 [SWAP]
+        └─sda3 ext4         99e3f6df-65f7-444d-ae4e-16c66e33fd86 /
+        sdb                                                      
+        └─sdb1 ext2         4797ae2c-95a0-4214-aa3a-0d65ce110ccb /home/newdisk
+                                                                    ↑挂载完成
+
+            ※但此时是临时挂载，重启机器后挂载关系就消失了
+
+        4.设置永久（自动）挂载
+            a. vim /etc/fstab
+            b. 将挂载关系记录
+                /dev/sdb1   /home/newdisk   ext4    defaults    0   0
+            c. mount -a 即可生效
+
+### 12.5 卸载分区
+
+    语法:
+        umount 设备名|目录
 
