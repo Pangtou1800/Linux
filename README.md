@@ -1596,3 +1596,123 @@
     语法:
         umount 设备名|目录
 
+### 12.6 磁盘情况查询
+
+    功能1：
+        查询系统整体磁盘使用情况
+
+    语法:
+        df -lh  - report file system disk space usage
+
+        Filesystem      Size  Used Avail Use% Mounted on
+        /dev/sda3        18G  3.1G   14G  19% /
+        tmpfs           2.0G   84K  2.0G   1% /dev/shm
+        /dev/sda1       190M   39M  142M  22% /boot
+        /dev/sdb1       2.0G  3.0M  1.9G   1% /home/newdisk
+
+    功能2：
+        查询指定目录的磁盘占用情况
+
+    语法：
+        du -ach 目录  - estimate file space usage
+
+    常用选项：
+        -s 指定目录占用大小汇总
+        -h 带计量单位
+        -a 含文件
+        --max-depth=1 子目录深度
+        -c 列出明细的同时，增加汇总值
+
+### 12.7 磁盘情况：工作实用指令
+
+    1.统计/home目录下文件的个数
+        ls -l /home | grep "^-" | wc -l
+
+            wc  - print newline, word, and byte counts for each file
+
+    2.统计/home目录下目录的个数
+        ls -l /home | grep "^d" | wc -l
+
+    3.统计/home目录下包含子文件的个数
+        ls -lR /home | grep "^-" | wc -l
+
+    4.统计/home目录下包含子文件的个数
+        ls -lR /home | grep "^d" | wc -l
+        
+    5.树状图显示/home目录
+        ·yum install tree安装“tree”指令
+        ·tree /home
+
+## 第13章 Linux实操篇 网络配置
+
+### 13.1 Linux网络配置原理图（含虚拟机）
+
+                    NAT模式
+
+    Linux                       Windows
+    网卡：192.168.229.128 <-->  网卡1 -> vmnet8(虚拟网卡) 192.168.229.1
+                                ↕
+                                网卡2 -> 真实网卡 192.168.0.108 <- 网关 -> 连接外网
+
+### 13.2 查看网络IP和网关
+
+    VMWare → 编辑 → 虚拟网络编辑器 即可查看网络
+
+    → NAT设置 即可查看网关
+
+    ※VMnet8即对应了虚拟机的IP段
+
+    ·查看Windows下VMnet8网络配置
+        1.使用ipconfig指令查看
+        2.界面查看 控制面板 → 网络和Internet
+
+### 13.3 ping测试主机之间的连通性
+
+### 13.4 Linux网络环境配置
+
+    1.自动获取
+
+        通过登录界面来设置
+
+            系统 → 首选项 → 网络连接 → 编辑 → 自动连接 √ 应用即可
+
+        ※Linux会在启动后自动获取IP，缺点是每次获取的IP地址可能不一样，不适用于服务器
+
+    2.指定固定IP
+
+        直接修改配置文件来指定IP，并可以连接到外网
+        
+        ·编辑 /etc/sysconfig/network-scripts/ifcfg-eth0 (网卡eth0的配置文件)
+
+            DEVICE=eth0
+            TYPE=Ethernet
+            UUID=c6f69b11-a38c-4716-a4b8-c30034a6862a
+            ONBOOT=yes                  ←指定启动时连接
+            NM_CONTROLLED=yes
+            BOOTPROTO=static            ←以静态方式获取IP
+            DEFROUTE=yes
+            IPV4_FAILURE_FATAL=yes
+            IPV6INIT=no
+            NAME="System eth0"
+            IPADDR=192.168.229.128      ←IP地址
+            GATEWAY=192.168.229.1       ←网关
+            DNS1=192.168.229.1          ←DNS，与网关指定相同值即可
+            HWADDR=00:0C:29:4D:35:47
+            PEERDNS=yes
+            PEERROUTES=yes
+            LAST_CONNECT=1595852657
+
+            补充说明：
+                DEVICE  - 接口名（设备网卡）
+                HWADDR  - MAC地址
+                TYPE    - 网络类型，通常是Ethernet
+                UUID    - 随机ID
+                ONBOOT  - 系统启动时接口是否有效
+                BOOTPROTO  - IP的配置方法
+                             [none|static|bootp|dhcp]
+                             [引导时不使用协议|静态分配IP|BOOTP协议|DHCP协议]
+                IPADDR  - IP地址
+                GATEWAY - 网关
+                DNS1    - 域名解析器
+
+        ·service network restart 重启网络服务
