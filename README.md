@@ -1508,7 +1508,9 @@
 
     案例：
         为系统增加一块硬盘（2G sdb1到 /home/newdisk）
+
     
+
     准备工作：
         为虚拟机增加一块硬盘
 
@@ -1721,9 +1723,11 @@
 
 ### 14.1 进程的基本介绍
 
-    1.在Linux中，每个执行的程序都称为一个进程。每一个进程都分配一个ID号。
+    1. 在Linux中，每个执行的程序都称为一个进程。每一个进程都分配一个ID号。
+
     
-    2.每一个进程都会对应一个父进程，而这个父进程可以复制多个子进程。
+
+    2. 每一个进程都会对应一个父进程，而这个父进程可以复制多个子进程。
 
     3.进程可以以两种方式存在，前台与后台。
         前台就是指用户目前屏幕上可以进行操作的。
@@ -1781,6 +1785,7 @@
 ### 14.3 终止进程kill和killall
 
     介绍：
+
         若是某个进程执行到一半需要终止时，或是已经消耗了很大的系统资源时，可以考虑终止该进程。
         使用kill命令来完成此任务。
 
@@ -1835,6 +1840,7 @@
 ### 14.5 服务（Service）管理
 
     介绍：
+
         服务本质上就是一个进程，只不过是在后台运行。
         通常会监听某个端口，等待其他程序的请求，比如MySQL、sshd、防火墙等。
         因此我们又称其为守护进程，是Linux中非常重要的知识点。
@@ -1845,6 +1851,7 @@
         ※在CentOS 7.0以后，service → systemctl
 
     示例：
+
         查看防火墙的状态（iptables）
 
         service iptables status
@@ -1867,6 +1874,7 @@
         开机 -> BIOS -> /boot -> init进程1 -> 从/etc/inittab获取运行级别 -> 运行对应服务
 
     介绍：
+
         每个服务对应每个运行级别都会设置是否自启动
 
     指令
@@ -1875,3 +1883,164 @@
         chkconfig 服务名 --list  查看指令服务
         chkconfig --level 5 服务名 on/off  设置服务在指定级别下是否自启动
                                             （不指定level修改所有级别）
+
+### 14.8 动态监控进程
+
+    介绍：
+
+        top和ps命令很相似，它们都用来显示正在执行的进程。
+        不同的是top在执行一段时间之后可以更新正在执行的进程。
+
+    语法：
+        top [选项]
+
+    选项说明：
+        -d 秒数  指定top命令每隔几秒更新，默认3秒
+        -i       使top不显示任何闲置或僵死进程
+        -p       通过指定进程ID来仅仅监视某个进程的状态
+
+    
+
+    交互操作：
+        P  按CPU使用率排序（默认）
+        M  按内存使用率排序
+        N  按PID排序
+        q  退出
+        u 用户名  监控某用户的进程
+        k PID    杀死某进程
+
+    top - 19:36:27 up 9 min,  1 user,  load average: 0.00, 0.06, 0.06
+    当前时间      开机经过时间  用户数    负载均衡（均值超过0.7就算高负载）
+    Tasks:   1 total,   0 running,   1 sleeping,   0 stopped,   0 zombie
+    各任务总和
+    Cpu(s):  0.0%us,  0.1%sy,  0.0%ni, 99.9%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st
+    CPU使用率   用户    系统             空闲
+    Mem:   4039504k total,   395320k used,  3644184k free,    20120k buffers
+    内存使用状态
+    Swap:  2097148k total,        0k used,  2097148k free,   142088k cached
+    虚拟内存使用状态
+    PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND                                     
+    2465 root      20   0 66288 1212  476 S  0.0  0.0   0:00.01 sshd
+
+### 14.9 查看系统网络情况 ☆
+
+    语法：
+        netstat [选项]
+
+    常用选项：
+        -an 按一定顺序排列输出
+        -p  显示哪个进程在调用
+
+    示例：
+        1.查看所有的网络服务
+            netstat -anp | more
+        2.查看某一进程相关服务
+            netstat -anp | grep sshd
+
+## 第15章 Linux实操篇 RPM和YUM
+
+### 15.1 RPM包的管理
+
+    介绍：
+        一种用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中，生成.RPM扩展名的文件。
+        RPM是Redhat Package Manager(红帽软件包管理工具)的缩写，类似Windows的setup.exe。
+
+    简单查询指令：
+        rpm -qa | grep xxx  查询已安装的rpm列表
+
+        [root@hadoop1 ~]# rpm -qa | grep firefox
+        firefox-52.8.0-1.el6.centos.x86_64          ← .rpm后缀名被省略了
+
+        软件名 - 版本号  .适用的操作系统.系统位数（i686、i386表示32位，noarch表示通用）
+
+        rpm -q 软件包名  查询包是否已安装
+
+        [root@hadoop1 ~]# rpm -q firefox
+        firefox-52.8.0-1.el6.centos.x86_64
+
+        rpm -qi 软件包名  查询软件包详细信息
+
+        rpm -ql | more 软件包名  查询软件包的安装路径和所有安装文件
+
+        rpm -qf 文件路径  查询文件属于哪个安装包
+
+        [root@hadoop1 ~]# rpm -qf /etc/passwd
+        setup-2.8.14-23.el6.noarch
+
+    卸载rpm包：
+        rpm -e RPM包名
+
+        细节：
+            如果其他包依赖于删除对象包，则会提示
+            removing these packages would break dependencies: 
+                foo is needed by bar-1.0-1
+
+            此时，可以使用rpm -e --nodeps foo可以删除（依赖包将无法使用）
+
+    安装rpm包：
+        rpm -ivh RPM包名
+
+        参数说明：
+            -i install 安装
+            -v verbose 提示
+            -h hash 进度条
+
+        示例：
+            演示安装firefox浏览器
+                1)先找到firefox的安装包（使用CentOS安装盘的/media/下的安装包）
+                    /media/CentOS_6.10_Final/Packages/
+                2)拷贝安装包到/opt/目录下
+                    cp firefox-52.8.0-1.el6.centos.x86_64.rpm /opt/
+                3)来到/opt/目录下，进行安装
+                    rpm -ivh firefox-52.8.0-1.el6.centos.x86_64.rpm
+
+### 15.2 YUM包的管理
+
+    介绍：
+        Yum是一个Shell前端软件包管理器。基于RPM包管理，能够从指定的服务器自动下载RPM包并安装。
+        可以自动处理依赖关系，并且一次性安装所有的依赖软件包。
+        使用yum的前提是可以联网。
+
+    基本指令：
+        ·查询yum服务器是否有想要安装的软件
+            yum list | grep xxx
+        ·安装指定的yum包
+            yum install xxx
+
+            ※默认会安装最新版本
+
+## 第16章 Linux之JavaEE定制篇 搭建JavaEE环境
+
+### 16.1 概述
+
+    Linux           |        Windows
+                    |
+    JavaEE          |           
+                    |
+    ·Jdk            |
+    ·Tomcat     <------->    IE访问Web页面
+    ·MySQL          |
+    ·Eclipse        |
+
+### 16.2 安装Jdk
+
+    ※使用预先准备好的安装包进行安装
+
+    1.使用xftp5连接到远程机器，把准备好的软件上传到/opt/目录下
+        ·jdk-7u79-linux-x64.gz
+        ·eclipse-jee-mars-2-linux-gtk-x86_64.tar.gz
+        ·apache-tomcat-7.0.70.tar.gz
+        ·mysql-5.6.14.tar.gz
+
+    2.解压缩到/opt
+    3.配置环境变量vim /etc/profile
+        JAVA_HOME=/opt/jdk1.7.0_79
+        PATH=$PATH:$JAVA_HOME/bin  ※注意要带上$PATH:，不然只有PATH
+        EXPORT JAVA_HOME PATH
+
+        需要注销一次用户使环境变量生效（？）
+    
+    4.在任何目录下使用java和javac测试是否成功
+
+### 16.3 安装Tomcat
+
