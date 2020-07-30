@@ -1083,7 +1083,7 @@
 
         语法：
 
-            lcoate 搜索文件
+            locate 搜索文件
 
         特别说明：
             locate指令基于数据库进行查询，所以第一次运行前，必须使用
@@ -1932,9 +1932,13 @@
         -p  显示哪个进程在调用
 
     示例：
-        1.查看所有的网络服务
+
+        1. 查看所有的网络服务
+
             netstat -anp | more
-        2.查看某一进程相关服务
+
+        2. 查看某一进程相关服务
+
             netstat -anp | grep sshd
 
 ## 第15章 Linux实操篇 RPM和YUM
@@ -1942,7 +1946,8 @@
 ### 15.1 RPM包的管理
 
     介绍：
-        一种用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中，生成.RPM扩展名的文件。
+
+        一种用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中，生成. RPM扩展名的文件。
         RPM是Redhat Package Manager(红帽软件包管理工具)的缩写，类似Windows的setup.exe。
 
     简单查询指令：
@@ -1997,6 +2002,7 @@
 ### 15.2 YUM包的管理
 
     介绍：
+
         Yum是一个Shell前端软件包管理器。基于RPM包管理，能够从指定的服务器自动下载RPM包并安装。
         可以自动处理依赖关系，并且一次性安装所有的依赖软件包。
         使用yum的前提是可以联网。
@@ -2022,9 +2028,9 @@
     ·MySQL          |
     ·Eclipse        |
 
-### 16.2 安装Jdk
+    ※讲解中都使用预先准备好的安装包进行安装
 
-    ※使用预先准备好的安装包进行安装
+### 16.2 安装Jdk
 
     1.使用xftp5连接到远程机器，把准备好的软件上传到/opt/目录下
         ·jdk-7u79-linux-x64.gz
@@ -2039,8 +2045,17 @@
         EXPORT JAVA_HOME PATH
 
         需要注销一次用户使环境变量生效（？）
+
     
-    4.在任何目录下使用java和javac测试是否成功
+
+    4. 在任何目录下使用java和javac测试是否成功
 
 ### 16.3 安装Tomcat
 
+    1.解压缩到/opt
+        tar -zxvf apache-tomcat-7.0.70.tar.gz
+    2.进入tomcat的bin目录，启动start.sh
+        （service tomcat start）
+    3.编辑iptables，防火墙放行8080端口
+        vim /etc/sysconfig/iptables
+        -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT
